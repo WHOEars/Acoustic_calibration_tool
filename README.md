@@ -2,8 +2,7 @@
 
 A real-time acoustic calibration and analysis tool developed in Python.
 
-This application performs real-time FFT spectrum analysis and allow to create spectal power to dB AC using the system microphone.  
-It is intended for research and educational purposes only.
+This application performs real-time FFT spectrum analysis and allow to create spectal power to dB AC using a standard microphone.
 
 ---
 
