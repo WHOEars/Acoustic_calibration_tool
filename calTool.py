@@ -57,9 +57,11 @@ class SpectrumAnalyzerApp:
         self.smooth_factor = tk.DoubleVar(value=0.9)
 
         self.selected_device = tk.StringVar()
-        self.device_list = self.get_input_devices()
-        if self.device_list:
-            self.selected_device.set(self.device_list[0])
+        self.input_devices = self.get_input_devices()
+        self.device_names = [d["name"] for d in self.input_devices]
+
+        if self.device_names:
+            self.selected_device.set(self.device_names[0])
 
         # Calibration variables
         self.calib_freq = tk.IntVar(value=1000)
@@ -90,7 +92,12 @@ class SpectrumAnalyzerApp:
         self.tabs.add(self.spectrum_frame, text="Spectrum Analyzer")
 
         ttk.Label(self.spectrum_frame, text="Input device:").grid(row=0, column=0, sticky=tk.W)
-        self.device_menu = ttk.OptionMenu(self.spectrum_frame, self.selected_device, self.selected_device.get(), *self.device_list)
+        self.device_menu = ttk.OptionMenu(
+            self.spectrum_frame,
+            self.selected_device,
+            self.selected_device.get(),
+            *self.device_names
+        )
         self.device_menu.grid(row=0, column=1, sticky=tk.W)
         ttk.Button(self.spectrum_frame, text="Start", command=self.start_stream).grid(row=0, column=2)
         ttk.Button(self.spectrum_frame, text="Stop", command=self.stop_stream).grid(row=0, column=3)
@@ -569,9 +576,14 @@ class SpectrumAnalyzerApp:
 
     # === Spectrum analyzer methods ===
     def get_input_devices(self):
+        """Return input-capable PortAudio devices as a list of dicts (name + index)."""
         devices = sd.query_devices()
-        return [d["name"] for d in devices if d["max_input_channels"] > 0]
-
+        input_devices = []
+        for i, d in enumerate(devices):
+            if d.get("max_input_channels", 0) > 0:
+                input_devices.append({"name": d["name"], "index": i})
+        return input_devices
+    
     def validate_parameters(self):
         msg = []
         try:
@@ -673,10 +685,18 @@ class SpectrumAnalyzerApp:
     def start_stream(self):
         if self.running:
             return
+    
+        selected_name = self.selected_device.get()
+        device_index = next(d["index"] for d in self.input_devices if d["name"] == selected_name)
+    
+        # print("Selected name:", selected_name)
+        # print("PortAudio device index passed to sounddevice:", device_index)
+        # print("PortAudio device info:", sd.query_devices(device_index))
+    
         self.smooth_factor_value, _ = self.validate_parameters()
         self.disable_controls()
         self.running = True
-        device_index = self.device_list.index(self.selected_device.get())
+    
         self.stream = sd.InputStream(
             channels=1,
             callback=self.audio_callback,
