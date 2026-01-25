@@ -31,6 +31,8 @@ Install dependencies with:
 
 `python calTool.py`
 
+Or just download standalone win/mac version
+
 ---
 
 ## 📜 License
