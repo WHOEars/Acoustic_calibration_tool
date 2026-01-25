@@ -11,8 +11,9 @@ This application performs real-time FFT spectrum analysis and allow to create sp
 - Real-time spectral display (dBFS)  
 - Adjustable frequency range and smoothing  
 - Manual and automatic peak detection  
-- Dark interface built with Tkinter  
-- Save spectrum images with annotations  
+- Save spectrum images with annotations
+- Callibration table editor with preloaded reference values
+- dB - AC regression calculation  
 
 ---
 
